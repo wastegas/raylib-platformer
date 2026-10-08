@@ -1,6 +1,6 @@
 TARGET	=	game
 CC	=	c++
-CXXFLAGS	=	`pkg-config --cflags raylib` -Wall  -std=c++17
+CXXFLAGS	=	`pkg-config --cflags raylib` -Wall  -std=c++17 -g
 INCLUDE	=	-Iinclude
 
 SRC_DIR	=	src
@@ -16,10 +16,10 @@ LDFLAGS	=	`pkg-config --libs raylib` -lm
 all:	$(TARGET)
 
 $(TARGET):	$(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	$(CC) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
