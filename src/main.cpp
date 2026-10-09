@@ -59,7 +59,8 @@ public:
       for (size_t i{}; i < playerTex.size(); ++i) {
 	for (auto& [key, value] : playerTex[i]){
 	  std::cout << "unloading " << static_cast<int>(key) << std::endl;
-	  UnloadTexture(value);
+	  if (IsTextureValid(value))
+	    UnloadTexture(value);
 	}
       }
     }
@@ -100,6 +101,7 @@ private:
   }
 
   void cleanup() {
+    player.cleanup();
     CloseWindow();
   }
 
