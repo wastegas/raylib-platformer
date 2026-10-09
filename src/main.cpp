@@ -1,24 +1,38 @@
+#include <memory>
 #include "raylib.h"
+
+class Game
+{
+public:
+  Game(){
+    InitWindow(windowWidth, windowHeight, "Raylib Platformer");
+    SetTargetFPS(60);
+  }
+  ~Game() { CloseWindow(); }
+  void run() {
+    while (!WindowShouldClose()) {
+      update();
+      render();
+    }
+  }
+private:
+  void update() {
+    
+  }
+
+  void render() {
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    EndDrawing();
+  }
+  
+  const int windowWidth = 800;
+  const int windowHeight = 600;
+};
 
 int main()
 {
-  constexpr int screenWidth{800};
-  constexpr int screenHeight{600};
-
-  InitWindow(screenWidth, screenHeight, "Raylib Platformer");
-  SetTargetFPS(60);
-
-  /*
-    main loop
-  */
-  while (!WindowShouldClose()) {
-
-
-    BeginDrawing();
-    ClearBackground(BLACK);
-    
-    EndDrawing();
-  }
-
-  CloseWindow();
+  std::unique_ptr<Game> game = std::make_unique<Game>();
+  game->run();
 }
