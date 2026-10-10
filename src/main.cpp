@@ -10,6 +10,15 @@ enum class PlayerState {
   jumping = 2
 };
 
+// sprite info
+struct TexInfo {
+  Texture2D texture;
+  int width;
+  int height;
+  int frameWidth;
+  int numFrames;
+};
+
 class Player
 {
 public:
@@ -17,25 +26,25 @@ public:
   ~Player() { cleanup(); }
   bool init() {
     Texture2D tex;
-    std::unordered_map<PlayerState, Texture2D> new_map;
+    std::unordered_map<PlayerState, TexInfo> new_map;
     tex = LoadTexture("assets/standing.png");
     if (!IsTextureValid(tex)) {
       cleanup();
       return false;
     }
-    new_map[PlayerState::standing] = tex;
+    new_map[PlayerState::standing] = {tex, tex.width, tex.height, 303, 2};
     tex = LoadTexture("assets/run.png");
     if (!IsTextureValid(tex)) {
       cleanup();
       return false;
     }
-    new_map[PlayerState::running] = tex;
+    new_map[PlayerState::running] = {tex, tex.width, tex.height, 307, 5};
     tex = LoadTexture("assets/jump.png");
     if (!IsTextureValid(tex)) {
       cleanup();
       return false;
     }
-    new_map[PlayerState::jumping] = tex;
+    new_map[PlayerState::jumping] = {tex, tex.width, tex.height, 329 , 2};
     playerTex.push_back(new_map);
     
     return true;
@@ -46,7 +55,8 @@ public:
   }
 
   Texture2D getTexture(PlayerState state) {
-    return playerTex[static_cast<int>(state)][state];
+    TexInfo t = playerTex[static_cast<int>(state)][state];
+    return t.texture;
   }
 
   void render() {
@@ -59,8 +69,8 @@ public:
       for (size_t i{}; i < playerTex.size(); ++i) {
 	for (auto& [key, value] : playerTex[i]){
 	  //std::cout << "unloading " << static_cast<int>(key) << std::endl;
-	  if (IsTextureValid(value))
-	    UnloadTexture(value);
+	  if (IsTextureValid(value.texture))
+	    UnloadTexture(value.texture);
 	}
 	playerTex.clear(); // prevent cleanup from running twice
       }
@@ -69,7 +79,7 @@ public:
   }
 private:
 
-  std::vector<std::unordered_map<PlayerState, Texture2D>> playerTex;
+  std::vector<std::unordered_map<PlayerState, TexInfo>> playerTex;
   PlayerState currentState = PlayerState::standing;
 };
 
