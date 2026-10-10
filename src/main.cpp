@@ -58,12 +58,14 @@ public:
     if(!playerTex.empty()) {
       for (size_t i{}; i < playerTex.size(); ++i) {
 	for (auto& [key, value] : playerTex[i]){
-	  std::cout << "unloading " << static_cast<int>(key) << std::endl;
+	  //std::cout << "unloading " << static_cast<int>(key) << std::endl;
 	  if (IsTextureValid(value))
 	    UnloadTexture(value);
 	}
+	playerTex.clear(); // prevent cleanup from running twice
       }
     }
+    //std::cout << "player destructor" << std::endl;
   }
 private:
 
@@ -81,7 +83,10 @@ public:
       cleanup();
     }
   }
-  ~Game() { cleanup(); }
+  ~Game() {
+    cleanup();
+    //std::cout << "game destructor" << std::endl;
+  }
   void run() {
     while (!WindowShouldClose()) {
       update();
@@ -103,6 +108,7 @@ private:
   void cleanup() {
     player.cleanup();
     CloseWindow();
+    //std::cout << "Game cleanup" << std::endl;
   }
 
   Player player;
