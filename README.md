@@ -6,7 +6,7 @@ It's will be a simple platformer game for exploring the programing design of cre
 
 I'll update this README as I progress.
 
-## Prereqquisites
+## Prerequisites
 To run or build this project, you will need **raylib** installed on your system. You can find instructions on how to install it from the official [raylib github](https://github.com/raysan5/raylib) page.
 
 ## License
