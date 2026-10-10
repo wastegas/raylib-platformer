@@ -2,7 +2,7 @@
 
 Initial development.
 
-It's will be a simple platformer game for explorering the programing design of creating one.
+It's will be a simple platformer game for exploring the programing design of creating one.
 
 I'll update this README as I progress.
 
