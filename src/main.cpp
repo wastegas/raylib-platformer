@@ -64,6 +64,7 @@ public:
     if (IsKeyDown(KEY_D)) {
       destPos.x += speed * dt;
       currentState = PlayerState::running;
+      getTexture(currentState);
       #ifdef DEBUG_MODE
       std::cout << "currentState=" << static_cast<int>(currentState) << std::endl;
       #endif
@@ -78,16 +79,18 @@ public:
     if (IsKeyDown(KEY_A)) {
       destPos.x -= speed * dt;
       currentState = PlayerState::running;
+      getTexture(currentState);
+      sourceRec.width = -sourceRec.width;
+
     }
     if (IsKeyReleased(KEY_D) || IsKeyReleased(KEY_A)) {
       speed = 0.f;
       currentState = PlayerState::standing;
+      getTexture(currentState);
       #ifdef DEBUG_MODE
       std::cout << "currentState=" << static_cast<int>(currentState) << std::endl;
       #endif
     }
-
-    getTexture(currentState);
     
     runningTime += dt;
     if (runningTime >= frameTime) {
