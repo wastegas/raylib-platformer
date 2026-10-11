@@ -46,22 +46,42 @@ public:
     }
     new_map[PlayerState::jumping] = {tex, tex.width, tex.height, 329 , 2};
     playerTex.push_back(new_map);
+
+    getTexture(currentState);
     
     return true;
   }
 
-  void update() {
-    
+  void update(float &dt) {
+    //getTexture(currentState);
+    runningTime += dt;
+    if (runningTime >= frameTime) {
+      runningTime = 0.f;
+      currentFrame = ((int)currentFrame +1) % totalFrames;
+      sourceRec.x = (float)currentFrame * frameWidth;
+    }
+    #ifdef DEBUG_MODE
+    std::cout << "currentFrame " << currentFrame << std::endl;
+    std::cout << "sourceRec.x " << sourceRec.x << std::endl;
+    if (IsTextureValid(currentTexture))
+      std::cout << "texture is loaded " << std::endl;
+    #endif
   }
 
-  Texture2D getTexture(PlayerState state) {
+  void getTexture(PlayerState state) {
     TexInfo t = playerTex[static_cast<int>(state)][state];
-    return t.texture;
+    totalFrames = t.numFrames;
+    frameWidth = t.frameWidth;
+    sourceRec = {0.f, 0.f, static_cast<float>(t.frameWidth), static_cast<float>(t.height)};
+    currentTexture =  t.texture;
   }
 
   void render() {
-    DrawTexture(getTexture(currentState), 400, 300, WHITE);
-    
+    #ifndef DEBUG_MODE
+    DrawTextureRec(currentTexture, sourceRec, destPos, WHITE);
+    #else
+    DrawTexture(currentTexture, 400, 300, WHITE);
+    #endif
   }
 
   void cleanup() {
@@ -81,6 +101,14 @@ private:
 
   std::vector<std::unordered_map<PlayerState, TexInfo>> playerTex;
   PlayerState currentState = PlayerState::standing;
+  float currentFrame;
+  Texture2D currentTexture;
+  float frameTime = 0.1f;
+  int frameWidth = 0;
+  float runningTime = 0.f;
+  Rectangle sourceRec = {0.f, 0.f, 0.f, 0.f};
+  Vector2 destPos = {400.f, 300.f};
+  int totalFrames = 0;
 };
 
 class Game
@@ -98,14 +126,16 @@ public:
     //std::cout << "game destructor" << std::endl;
   }
   void run() {
+
     while (!WindowShouldClose()) {
-      update();
+      float dt = GetFrameTime();
+      update(dt);
       render();
     }
   }
 private:
-  void update() {
-    player.update();
+  void update(float &dt) {
+    player.update(dt);
   }
 
   void render() {
