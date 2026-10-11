@@ -26,26 +26,32 @@ public:
   ~Player() { cleanup(); }
   bool init() {
     Texture2D tex;
-    std::unordered_map<PlayerState, TexInfo> new_map;
+    std::unordered_map<PlayerState, TexInfo> new_map1, new_map2, new_map3;
     tex = LoadTexture("assets/standing.png");
     if (!IsTextureValid(tex)) {
       cleanup();
       return false;
     }
-    new_map[PlayerState::standing] = {tex, tex.width, tex.height, 303, 2};
+    new_map1[PlayerState::standing] = {tex, tex.width, tex.height, 303, 2};
+    playerTex.push_back(new_map1);
     tex = LoadTexture("assets/run.png");
     if (!IsTextureValid(tex)) {
       cleanup();
       return false;
     }
-    new_map[PlayerState::running] = {tex, tex.width, tex.height, 307, 5};
+    new_map2[PlayerState::running] = {tex, tex.width, tex.height, 307, 5};
+    playerTex.push_back(new_map2);
     tex = LoadTexture("assets/jump.png");
     if (!IsTextureValid(tex)) {
       cleanup();
       return false;
     }
-    new_map[PlayerState::jumping] = {tex, tex.width, tex.height, 329 , 2};
-    playerTex.push_back(new_map);
+    new_map3[PlayerState::jumping] = {tex, tex.width, tex.height, 329 , 2};
+    playerTex.push_back(new_map3);
+
+    #ifdef DEBUG_MODE
+    std::cout << "playerTex size=" << playerTex.size() << std::endl;
+    #endif
 
     getTexture(currentState);
     
@@ -53,19 +59,42 @@ public:
   }
 
   void update(float &dt) {
-    //getTexture(currentState);
+    float speed = 200.f;
+
+    if (IsKeyDown(KEY_D)) {
+      destPos.x += speed * dt;
+      currentState = PlayerState::running;
+      #ifdef DEBUG_MODE
+      std::cout << "currentState=" << static_cast<int>(currentState) << std::endl;
+      #endif
+      #ifdef DEBUG_MODE
+      if (IsTextureValid(currentTexture)) 
+	std::cout << "texture running loaded" << std::endl;
+      else
+	std::cout << "texture running not loaded" << std::endl;
+      std::cout << "destPos.x = " << destPos.x << std::endl;
+      #endif
+    }
+    if (IsKeyDown(KEY_A)) {
+      destPos.x -= speed * dt;
+      currentState = PlayerState::running;
+    }
+    if (IsKeyReleased(KEY_D) || IsKeyReleased(KEY_A)) {
+      speed = 0.f;
+      currentState = PlayerState::standing;
+      #ifdef DEBUG_MODE
+      std::cout << "currentState=" << static_cast<int>(currentState) << std::endl;
+      #endif
+    }
+
+    getTexture(currentState);
+    
     runningTime += dt;
     if (runningTime >= frameTime) {
       runningTime = 0.f;
       currentFrame = ((int)currentFrame +1) % totalFrames;
       sourceRec.x = (float)currentFrame * frameWidth;
     }
-    #ifdef DEBUG_MODE
-    std::cout << "currentFrame " << currentFrame << std::endl;
-    std::cout << "sourceRec.x " << sourceRec.x << std::endl;
-    if (IsTextureValid(currentTexture))
-      std::cout << "texture is loaded " << std::endl;
-    #endif
   }
 
   void getTexture(PlayerState state) {
@@ -103,7 +132,7 @@ private:
   PlayerState currentState = PlayerState::standing;
   float currentFrame;
   Texture2D currentTexture;
-  float frameTime = 0.1f;
+  float frameTime = 0.01f;
   int frameWidth = 0;
   float runningTime = 0.f;
   Rectangle sourceRec = {0.f, 0.f, 0.f, 0.f};
@@ -115,6 +144,9 @@ class Game
 {
 public:
   Game(){
+    #ifdef DEBUG_MODE
+    SetTraceLogLevel(LOG_NONE);
+    #endif
     InitWindow(windowWidth, windowHeight, "Raylib Platformer");
     SetTargetFPS(60);
     if (!player.init()) {
