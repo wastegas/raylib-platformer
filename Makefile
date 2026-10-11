@@ -1,6 +1,14 @@
 TARGET	=	game
 CC	=	c++
-CXXFLAGS	=	`pkg-config --cflags raylib` -Wall  -std=c++17 -g
+
+DEBUG ?=0
+
+ifeq ($(DEBUG), 1)
+	CXXFLAGS = `pkg-config --cflags raylib` -Wall  -std=c++17 -g -DDEBUG_MODE
+else
+	CXXFLAGS = `pkg-config --cflags raylib` -O2 -Wall
+endif
+
 INCLUDE	=	-Iinclude
 
 SRC_DIR	=	src
