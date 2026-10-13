@@ -83,7 +83,12 @@ public:
       sourceRec.width = -sourceRec.width;
 
     }
-    if (IsKeyReleased(KEY_D) || IsKeyReleased(KEY_A)) {
+    if (IsKeyDown(KEY_SPACE)) {
+      destPos.y += jumpForce *dt;
+      currentState = PlayerState::jumping;
+      getTexture(currentState);
+    }
+    if (IsKeyReleased(KEY_D) || IsKeyReleased(KEY_A) || IsKeyReleased(KEY_SPACE)) {
       speed = 0.f;
       currentState = PlayerState::standing;
       getTexture(currentState);
@@ -98,6 +103,8 @@ public:
       currentFrame = ((int)currentFrame +1) % totalFrames;
       sourceRec.x = (float)currentFrame * frameWidth;
     }
+
+    destPos.y += gravity * dt;
   }
 
   void getTexture(PlayerState state) {
@@ -141,6 +148,8 @@ private:
   Rectangle sourceRec = {0.f, 0.f, 0.f, 0.f};
   Vector2 destPos = {400.f, 300.f};
   int totalFrames = 0;
+  float jumpForce = -400.f;
+  float gravity = 150.1f;
 };
 
 class Game
