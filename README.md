@@ -8,7 +8,7 @@ It's will be a simple platformer game for exploring the programing design of cre
 - [x] Add sprite
 - [x] Add animation
 - [x] Add movement
-- [ ] Add jumping/gravity
+- [x] Add jumping/gravity
 - [ ] Add collision
 - [ ] Add tilemap
 - [ ] Add camera movement
