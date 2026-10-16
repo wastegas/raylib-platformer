@@ -54,7 +54,7 @@ public:
     #endif
 
     getTexture(currentState);
-    
+        
     return true;
   }
 
@@ -87,6 +87,8 @@ public:
       destPos.y += jumpForce *dt;
       currentState = PlayerState::jumping;
       getTexture(currentState);
+      gravity = 150.f;
+      grounded = false;
     }
     if (IsKeyReleased(KEY_D) || IsKeyReleased(KEY_A) || IsKeyReleased(KEY_SPACE)) {
       speed = 0.f;
@@ -103,7 +105,7 @@ public:
       currentFrame = ((int)currentFrame +1) % totalFrames;
       sourceRec.x = (float)currentFrame * frameWidth;
     }
-
+    //velY += gravity;
     destPos.y += gravity * dt;
   }
 
@@ -115,6 +117,22 @@ public:
     currentTexture =  t.texture;
   }
 
+  Rectangle getHitbox() {
+    return Rectangle{destPos.x, destPos.y, static_cast<int>(currentTexture.width), static_cast<int>(currentTexture.height)};
+  }
+
+  void resetPlayerY(int currY) {
+    if (!grounded) {
+      destPos.y -= 9;
+      velY = 0.f;
+      grounded = true;
+      gravity = 0.f;
+    }
+  }
+
+  bool checkGrounded() {
+    return grounded;
+  }
   void render() {
     #ifndef DEBUG_MODE
     DrawTextureRec(currentTexture, sourceRec, destPos, WHITE);
@@ -149,7 +167,9 @@ private:
   Vector2 destPos = {400.f, 300.f};
   int totalFrames = 0;
   float jumpForce = -400.f;
-  float gravity = 150.1f;
+  float gravity = 50.1f;
+  float velY = 0.f;
+  bool grounded = false;
 };
 
 class Game
@@ -180,12 +200,21 @@ public:
 private:
   void update(float &dt) {
     player.update(dt);
+    if (!player.checkGrounded()) {
+      if (CheckCollisionRecs(player.getHitbox(), floor)) {
+#ifdef DEBUG_MODE
+	std::cout << "collision!" << std::endl;
+#endif
+	player.resetPlayerY(floor.y);
+      }
+    }
   }
 
   void render() {
     BeginDrawing();
     ClearBackground(BLACK);
     player.render();
+    DrawRectangle(floor.x, floor.y, floor.width, floor.height, RAYWHITE);
     EndDrawing();
   }
 
@@ -198,6 +227,8 @@ private:
   Player player;
   const int windowWidth = 1024;
   const int windowHeight = 768;
+  Rectangle floor = {0.f, 758, 1024.f, 10.f};
+
 };
 
 int main()
